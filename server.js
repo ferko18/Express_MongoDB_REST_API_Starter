@@ -42,7 +42,7 @@ server.use((res, req, next) => {
 //6. handle 404 errors
 server.use((err, req, res, next) => {
   const env = process.env.NODE_ENV;
-  const error = env === "development" ? err : {};
+  const error = env === "development" ? err : {message: 'can\'t process your request this time, try again latter'};
   const status = err.status || 500;
 
   res.status(status).json({

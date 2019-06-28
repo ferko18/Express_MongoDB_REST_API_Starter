@@ -11,7 +11,7 @@ const connectionstring = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${PORT}
 
 var connection = mongoose.connect(connectionstring.toString(),{useNewUrlParser: true}, function(error){
     if ( error){
-       throw error
+       console.log('\n can\'t connect to the database, makesure mongoDB is running')
     }
 })
 
