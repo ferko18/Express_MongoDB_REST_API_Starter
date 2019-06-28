@@ -26,7 +26,7 @@ server.get("/", (req, res) => {
 //NOTE: routes should be executed before error handling
 //7. Import routes 
 
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/usersRouter');
 
 //8.Use routes 
 

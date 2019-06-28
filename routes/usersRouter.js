@@ -3,6 +3,8 @@ const router = express.Router();
 
 //import model
 const User = require("../models/userModel");
+const Task = require("../models/taskModel")
+
 
 //get all users
 
@@ -46,7 +48,7 @@ router.put("/:userId", async (req, res, next) => {
   try {
     const { userId } = req.params;
     const newUser = req.body;
-    const updatededUser = await User.findByIdAndUpdate(userId, newUser);
+    const updatededUser = await User.findByIdAndUpdate(userId, newUser); //this still holds old user
     res.status(201).json(newUser);
   } catch (err) {
     next(err);
@@ -64,5 +66,25 @@ router.delete("/:userId", async (req, res, next) => {
     next(err);
   }
 });
+
+//add task per user 
+
+router.post("/:userId/tasks", async (req, res, next)=>{
+  try{
+ const {userId} = req.params;
+ const newTask = new Task (req.body);
+ const user = await User.findById(userId);
+ newTask.owner = user;
+ await newTask.save();
+ user.tasks.push(newTask);
+ await user.save();
+ res.status(201).json(newTask)
+
+  }catch(err)
+  {
+    next(err)
+  }
+ 
+})
 
 module.exports = router;
