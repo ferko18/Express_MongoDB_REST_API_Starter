@@ -27,45 +27,42 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-//get user by id 
+//get user by id
 
-router.get("/:userId", async (req, res, next)=>{
-    try{
-    const {userId}= req.params;
-    const user = await User.findById(userId)
-    console.log(userId)
-    res.status(200).json(user)
-} catch (err){
-    next(err)
-}
-})
+router.get("/:userId", async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    console.log(userId);
+    res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+});
 
-//edit user 
+//edit user
 
-router.put("/:userId", async (req, res, next)=>{
-  try{
-    const {userId}= req.params;
+router.put("/:userId", async (req, res, next) => {
+  try {
+    const { userId } = req.params;
     const newUser = req.body;
     const updatededUser = await User.findByIdAndUpdate(userId, newUser);
-    res.status(201).json(newUser)
-  }catch(err)
-  {
-    next(err)
+    res.status(201).json(newUser);
+  } catch (err) {
+    next(err);
   }
-})
+});
 
-//delete user 
+//delete user
 
-router.delete('/:userId', async(req, res, next)=>{
-  try{
-    const {userId} = req.params;
-    const tobedeleted = await User.deleteOne({ "_id" : userId })
-    res.status(200).json(tobedeleted)
+router.delete("/:userId", async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const tobedeleted = await User.deleteOne({ _id: userId });
+    res.status(200).json(tobedeleted);
+  } catch (err) {
+    next(err);
   }
-  catch(err)
-  {
-    next(err)
-  }
-})
+});
 
 module.exports = router;
