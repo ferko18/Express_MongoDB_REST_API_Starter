@@ -3,8 +3,7 @@ const router = express.Router();
 
 //import model
 const User = require("../models/userModel");
-const Task = require("../models/taskModel")
-
+const Task = require("../models/taskModel");
 
 //get all users
 
@@ -67,24 +66,32 @@ router.delete("/:userId", async (req, res, next) => {
   }
 });
 
-//add task per user 
+//add task per user
 
-router.post("/:userId/tasks", async (req, res, next)=>{
-  try{
- const {userId} = req.params;
- const newTask = new Task (req.body);
- const user = await User.findById(userId);
- newTask.owner = user;
- await newTask.save();
- user.tasks.push(newTask);
- await user.save();
- res.status(201).json(newTask)
-
-  }catch(err)
-  {
-    next(err)
+router.post("/:userId/tasks", async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const newTask = new Task(req.body);
+    const user = await User.findById(userId);
+    newTask.owner = user;
+    await newTask.save();
+    user.tasks.push(newTask);
+    await user.save();
+    res.status(201).json(newTask);
+  } catch (err) {
+    next(err);
   }
- 
-})
+});
+
+//get tasks per user
+router.get("/:userId/tasks", async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate('tasks');
+    res.status(200).json(user.tasks);
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
