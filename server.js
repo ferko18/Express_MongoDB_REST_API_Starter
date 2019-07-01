@@ -12,7 +12,7 @@ const server = express();
 server.use(logger("dev"));
 
 mongoose.connection.once('open', function () {  
-  console.log('\n connected to MongoDB...\n');
+  console.log("\x1b[35m",'\n connected to MongoDB...\n');
 }); 
 
 //3. use dependencies

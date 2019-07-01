@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
+const Joi = require("@hapi/joi");
+
 //import model
 const User = require("../models/userModel");
 const Task = require("../models/taskModel");
+
+//import validator
+const { useridSchema, validateParam } = require("../helpers/routeHelpers");
 
 //get all users
 
@@ -33,9 +38,18 @@ router.post("/", async (req, res, next) => {
 router.get("/:userId", async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const user = await User.findById(userId);
-    console.log(userId);
-    res.status(200).json(user);
+    const useridvalid = Joi.validate({ userid: userId }, useridSchema);
+     console.log(useridvalid.value);
+    if (useridvalid.error) {
+      res.status(400).json({ message: "user id not valid" });
+    } else {
+      const user = await User.findById(useridvalid.value.userid);
+      if (user !== null) {
+        res.status(200).json(user);
+      } else {
+        res.status(400).json({ message: "the specified id does not exist" });
+      }
+    }
   } catch (err) {
     next(err);
   }
@@ -84,10 +98,10 @@ router.post("/:userId/tasks", async (req, res, next) => {
 });
 
 //get tasks per user
-router.get("/:userId/tasks", async (req, res, next) => {
+router.get("/:userId/tasks",  validateParam(useridSchema, 'userId'), async (req, res, next) => {
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId).populate('tasks');
+    const { userId } = req.value.params;
+    const user = await User.findById(userId).populate("tasks");
     res.status(200).json(user.tasks);
   } catch (err) {
     next(err);
