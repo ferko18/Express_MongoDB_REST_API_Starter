@@ -8,7 +8,7 @@ const User = require("../models/userModel");
 const Task = require("../models/taskModel");
 
 //import validator
-const { useridSchema, validateParam } = require("../helpers/routeHelpers");
+const { useridSchema, validateParam, userSchema, validateuserBody } = require("../helpers/routeHelpers");
 
 //get all users
 
@@ -21,11 +21,11 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-//add new user
+//add new user --validation with middleware 
 
-router.post("/", async (req, res, next) => {
+router.post("/", validateuserBody(userSchema),async (req, res, next) => {
   try {
-    const newUser = new User(req.body);
+    const newUser = new User(req.value.body);
     const user = await newUser.save();
     res.status(201).json(user);
   } catch (err) {
@@ -33,7 +33,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-//get user by id
+//get user by id--validation here is done using direct approach
 
 router.get("/:userId", async (req, res, next) => {
   try {
@@ -57,10 +57,10 @@ router.get("/:userId", async (req, res, next) => {
 
 //edit user
 
-router.put("/:userId", async (req, res, next) => {
+router.put("/:userId", validateuserBody(userSchema), async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const newUser = req.body;
+    const newUser = req.value.body;
     const updatededUser = await User.findByIdAndUpdate(userId, newUser); //this still holds old user
     res.status(201).json(newUser);
   } catch (err) {
@@ -97,12 +97,17 @@ router.post("/:userId/tasks", async (req, res, next) => {
   }
 });
 
-//get tasks per user
+//get tasks per user--validation with a middleware
 router.get("/:userId/tasks",  validateParam(useridSchema, 'userId'), async (req, res, next) => {
   try {
     const { userId } = req.value.params;
     const user = await User.findById(userId).populate("tasks");
-    res.status(200).json(user.tasks);
+    if (user!==null)
+    {
+    res.status(200).json(user.tasks);}
+    else{
+      res.status(400).json({ message: "the specified id does not exist" });
+    }
   } catch (err) {
     next(err);
   }
