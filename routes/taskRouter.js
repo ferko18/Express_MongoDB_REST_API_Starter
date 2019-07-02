@@ -24,14 +24,14 @@ router.get("/", async (req, res, next) => {
 });
 
 //note this assumes the user id supplied to the body. In reality, we can get the user id from token
-router.post("/", async (req, res, next) => {
+router.post("/", validateBody(taskSchema), async (req, res, next) => {
   try {
-    const user = await User.findById(req.body.owner);
-    const Newtask = new Task(req.body);
+    const Newtask = new Task(req.value.body);
     const task = await Newtask.save();
-    //note user should know a task is added 
-    user.tasks.push(Newtask)
-    await user.save()
+    //note user should know a task is added
+    const user = await User.findById(req.body.owner);
+    user.tasks.push(Newtask);
+    await user.save();
     res.status(200).json(task);
   } catch (err) {
     next(err);

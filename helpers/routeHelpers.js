@@ -24,17 +24,15 @@ module.exports = {
   }),
 
   taskSchema: Joi.object().keys({
-    title: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(255)
+    //this regex allows space between words \w+ =[a-zA-Z0-9]
+    title: Joi.string().regex(/^[\w+( \w+)*]{5,255}$/)
       .required(),
-    description: Joi.string()
-      .alphanum()
-      .min(5)
-      .max(255)
+    description: Joi.string().regex(/^[\w+( \w+)*]{5,255}$/)
       .required(),
-    duedate: Joi.date().required()
+    duedate: Joi.date().required(), 
+    owner: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
   }),
 
   validateParam: (schema, name) => {
@@ -56,6 +54,7 @@ module.exports = {
       {
         const result = Joi.validate(req.body, schema);
         if (result.error) {
+          // console.log(result.error)
           return res.status(400).json({ message: "invalid entry, make sure to enter required fields" });
         } else {
           if (!req.value) req.value = {};
