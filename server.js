@@ -27,10 +27,12 @@ server.get("/", (req, res) => {
 //7. Import routes 
 
 const usersRouter = require('./routes/usersRouter');
+const taskRouter = require('./routes/taskRouter');
 
 //8.Use routes 
 
-server.use('/users', usersRouter)
+server.use('/users', usersRouter);
+server.use('/tasks', taskRouter)
 
 //5. catch 404 errors
 server.use((res, req, next) => {

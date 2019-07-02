@@ -1,7 +1,7 @@
 const Joi = require("@hapi/joi");
 
 module.exports = {
-  useridSchema: Joi.object().keys({
+  idSchema: Joi.object().keys({
     param: Joi.string()
       .regex(/^[0-9a-fA-F]{24}$/)
       .required()
@@ -23,11 +23,25 @@ module.exports = {
       .required()
   }),
 
+  taskSchema: Joi.object().keys({
+    title: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(255)
+      .required(),
+    description: Joi.string()
+      .alphanum()
+      .min(5)
+      .max(255)
+      .required(),
+    duedate: Joi.date().required()
+  }),
+
   validateParam: (schema, name) => {
     return (req, res, next) => {
       const result = Joi.validate({ param: req.params[name] }, schema);
       if (result.error) {
-        return res.status(400).json({ message: "user id not valid" });
+        return res.status(400).json({ message: "id not valid" });
       } else {
         if (!req.value) req.value = {};
         if (!req.value.params) req.value.params = {};
@@ -37,7 +51,7 @@ module.exports = {
     };
   }, 
 
-  validateuserBody: (schema)=>{
+  validateBody: (schema)=>{
       return(req, res, next)=>
       {
         const result = Joi.validate(req.body, schema);

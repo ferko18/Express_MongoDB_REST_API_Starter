@@ -1,3 +1,5 @@
+//note some route validation not complete, get back to it when time allows 
+
 const express = require("express");
 const router = express.Router();
 
@@ -8,7 +10,7 @@ const User = require("../models/userModel");
 const Task = require("../models/taskModel");
 
 //import validator
-const { useridSchema, validateParam, userSchema, validateuserBody } = require("../helpers/routeHelpers");
+const { idSchema, validateParam, userSchema, validateBody } = require("../helpers/routeHelpers");
 
 //get all users
 
@@ -23,7 +25,7 @@ router.get("/", async (req, res, next) => {
 
 //add new user --validation with middleware 
 
-router.post("/", validateuserBody(userSchema),async (req, res, next) => {
+router.post("/", validateBody(userSchema),async (req, res, next) => {
   try {
     const newUser = new User(req.value.body);
     const user = await newUser.save();
@@ -38,14 +40,15 @@ router.post("/", validateuserBody(userSchema),async (req, res, next) => {
 router.get("/:userId", async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const useridvalid = Joi.validate({ userid: userId }, useridSchema);
-     console.log(useridvalid.value);
+    const useridvalid = Joi.validate({ param: userId }, idSchema);
+    //  console.log(useridvalid.value.param);
     if (useridvalid.error) {
+      // console.log(useridvalid.error)
       res.status(400).json({ message: "user id not valid" });
     } else {
-      const user = await User.findById(useridvalid.value.userid);
+      const user = await User.findById(useridvalid.value.param).populate("tasks");
       if (user !== null) {
-        res.status(200).json(user);
+        res.status(200).json({user: user});
       } else {
         res.status(400).json({ message: "the specified id does not exist" });
       }
@@ -57,7 +60,7 @@ router.get("/:userId", async (req, res, next) => {
 
 //edit user
 
-router.put("/:userId", validateuserBody(userSchema), async (req, res, next) => {
+router.put("/:userId", validateBody(userSchema), async (req, res, next) => {
   try {
     const { userId } = req.params;
     const newUser = req.value.body;
@@ -98,7 +101,7 @@ router.post("/:userId/tasks", async (req, res, next) => {
 });
 
 //get tasks per user--validation with a middleware
-router.get("/:userId/tasks",  validateParam(useridSchema, 'userId'), async (req, res, next) => {
+router.get("/:userId/tasks",  validateParam(idSchema, 'userId'), async (req, res, next) => {
   try {
     const { userId } = req.value.params;
     const user = await User.findById(userId).populate("tasks");

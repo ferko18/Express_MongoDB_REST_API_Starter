@@ -6,10 +6,10 @@ const taskSchema = new Schema(
         title: String, 
         description: String, 
         duedate: Date,
-        owner:[{
+        owner:{
             type: Schema.Types.ObjectId, 
             ref: 'user'
-        }]
+        }
     }
 )
 
